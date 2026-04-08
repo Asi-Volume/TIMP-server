@@ -19,11 +19,11 @@ bool ServerController::startServer(quint16 port)
     connect(m_tcpServer, &QTcpServer::newConnection, this, &ServerController::slotNewConnection);
 
     if (!m_tcpServer->listen(QHostAddress::Any, port)) {
-        qDebug() << "������ ������� ������� �� �����" << port;
+        qDebug() << "Не удалось запустить сервер на порту" << port;
         return false;
     }
 
-    qDebug() << "������ ������� �� �����" << port;
+    qDebug() << "Сервер запущен на" << port;
     return true;
 }
 
@@ -35,14 +35,14 @@ void ServerController::stopServer()
         }
         m_buffer.clear();
         m_tcpServer->close();
-        qDebug() << "������ ����������";
+        qDebug() << "Сервер прекратил работу";
     }
 }
 
 void ServerController::slotNewConnection()
 {
     QTcpSocket *clientSocket = m_tcpServer->nextPendingConnection();
-    qDebug() << "����� ����������� ��" << clientSocket->peerAddress().toString();
+    qDebug() << "Новое подключение от" << clientSocket->peerAddress().toString();
 
     connect(clientSocket, &QTcpSocket::readyRead, this, &ServerController::slotServerRead);
     connect(clientSocket,
@@ -74,7 +74,7 @@ void ServerController::slotServerRead()
 
 void ServerController::processMessage(const QString &message, QTcpSocket *socket)
 {
-    qDebug() << "���������:" << message;
+    qDebug() << "Получено сообщение:" << message;
 
     RequestType type = m_model->parseRequest(message);
     QString response;
@@ -128,14 +128,14 @@ void ServerController::sendResponse(QTcpSocket *socket, const QString &response)
 {
     socket->write((response + "\n").toUtf8());
     socket->flush();
-    qDebug() << "�����:" << response;
+    qDebug() << "Отправлено сообщение:" << response;
 }
 
 void ServerController::slotClientDisconnected()
 {
     QTcpSocket *clientSocket = qobject_cast<QTcpSocket *>(sender());
     if (clientSocket) {
-        qDebug() << "������ ����������";
+        qDebug() << "Клиент отключился";
         m_buffer.remove(clientSocket);
         clientSocket->deleteLater();
     }

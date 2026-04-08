@@ -21,11 +21,11 @@ bool Database::connect()
     db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName("server_database.db");
     if (!db.open()) {
-        qDebug() << "������ ��:" << db.lastError().text();
+        qDebug() << "Ошибка БД:" << db.lastError().text();
         return false;
     }
     createTables();
-    qDebug() << "�� ����������";
+    qDebug() << "БД подключена";
     return true;
 }
 
