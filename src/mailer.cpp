@@ -1,10 +1,45 @@
 #include "mailer.h"
+#include <QFile>
+#include <QTextStream>
+#include <QCoreApplication>
+#include <QDebug>
+#include <QDir>
+
+QString Mailing::authUser = "";
+QString Mailing::authPass = "";
+
+void Mailing::loadCredentials() {
+    QString appDir = QCoreApplication::applicationDirPath();
+    QString fullPath = appDir + "/.env";
+    qDebug() << "--- Поиск конфига ---";
+    qDebug() << "Рабочая директория:" << QDir::currentPath();
+    qDebug() << "Ожидаемый путь к .env:" << fullPath;
+    QFile file(fullPath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "Файл .env не найден по пути:" << fullPath;
+        return;
+    }
+
+    QTextStream in(&file);
+    while (!in.atEnd()) {
+        QString line = in.readLine();
+        if (line.startsWith("EMAIL=")) {
+            authUser = line.section('=', 1).trimmed();
+        } else if (line.startsWith("PASSWORD=")) {
+            authPass = line.section('=', 1).trimmed();
+        }
+    }
+    file.close();
+}
 
 bool Mailing::sendCode(const QString &toEmail, const QString &code) {
     QString host = "smtp.mail.ru";
     int port = 465;
-    QString user = "vlad.duev.80@mail.ru";
-    QString pass = "Qf5EZlGKXNrL75azQXlm";
+
+    if (authUser.isEmpty() || authPass.isEmpty()) {
+        qDebug() << "Данные из .env не загружены";
+        return false;
+    }
 
     QSslSocket socket;
     socket.connectToHostEncrypted(host, port);
@@ -33,20 +68,20 @@ bool Mailing::sendCode(const QString &toEmail, const QString &code) {
 
     // авторизация
     if (!executeStep("AUTH LOGIN", "334")) return false;
-    if (!executeStep(user.toUtf8().toBase64(), "334")) return false;
-    if (!executeStep(pass.toUtf8().toBase64(), "235")) { //235 - успех
+    if (!executeStep(authUser.toUtf8().toBase64(), "334")) return false;
+    if (!executeStep(authPass.toUtf8().toBase64(), "235")) { //235 - успех
         qDebug() << "Пароль не принят сервером";
         return false;
     }
 
     // конверт
-    executeStep(QString("MAIL FROM:<%1>").arg(user), "250");
+    executeStep(QString("MAIL FROM:<%1>").arg(authUser), "250");
     executeStep(QString("RCPT TO:<%1>").arg(toEmail), "250");
 
     if (!executeStep("DATA", "354")) return false; // данные
 
     // тело письма
-    QString message = "From: " + user + "\r\n" +
+    QString message = "From: " + authUser + "\r\n" +
                       "To: " + toEmail + "\r\n" +
                       "Subject: Код восстановления\r\n" +
                       "Content-Type: text/plain; charset=\"utf-8\"\r\n" +
@@ -60,7 +95,6 @@ bool Mailing::sendCode(const QString &toEmail, const QString &code) {
         qDebug() << "After DATA:" << socket.readAll().trimmed();
     }
 
-    executeStep(message, "250");
     executeStep("QUIT", "221");
 
     socket.close();

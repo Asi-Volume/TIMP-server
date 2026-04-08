@@ -1,3 +1,4 @@
+#include "mailer.h"
 #include <QCoreApplication>
 #include <QDebug>
 #include "server_controller.h"
@@ -5,6 +6,7 @@
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
+    Mailing::loadCredentials();
 
     qDebug() << "Запуск TCP-сервера...";
 
