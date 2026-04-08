@@ -4,7 +4,7 @@
 #include <QString>
 #include "database.h"
 
-enum class RequestType { AUTH, REG, STAT, CHECK, UNKNOWN };
+enum class RequestType { AUTH, REG, STAT, CHECK, RECOVER_CODE, RECOVER_CONF, UNKNOWN };
 
 class ServerModel
 {
@@ -16,6 +16,8 @@ public:
     QString processReg(const QString &login, const QString &password, const QString &email);
     QString processStat(const QString &login);
     QString processCheck(const QString &login, int taskNumber, int variant, const QString &answer);
+    QString processRecoverRequest(const QString &email);
+    QString processRecoverConfirm(const QString &email, const QString &code, const QString &newPass);
 
 private:
     Database *db;

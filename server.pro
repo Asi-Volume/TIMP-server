@@ -7,12 +7,14 @@ CONFIG -= app_bundle
 DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
+    src/mailer.cpp \
     src/main.cpp \
     src/server_controller.cpp \
     src/server_model.cpp \
     src/database.cpp
 
 HEADERS += \
+    src/mailer.h \
     src/server_controller.h \
     src/server_model.h \
     src/database.h

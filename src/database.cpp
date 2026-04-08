@@ -97,6 +97,22 @@ bool Database::authUser(const QString &login, const QString &password)
     return false;
 }
 
+bool Database::emailExists(const QString &email) {
+    QSqlQuery query;
+    query.prepare("SELECT id FROM users WHERE email = :email");
+    query.bindValue(":email", email);
+    return query.exec() && query.next();
+}
+
+bool Database::updatePasswordByEmail(const QString &email, const QString &newPass) {
+    QSqlQuery query;
+    QByteArray hashedPassword = QCryptographicHash::hash(newPass.toUtf8(), QCryptographicHash::Sha256).toHex();
+    query.prepare("UPDATE users SET password = :pass WHERE email = :email");
+    query.bindValue(":pass", QString(hashedPassword));
+    query.bindValue(":email", email);
+    return query.exec();
+}
+
 UserData Database::getStats(const QString &login)
 {
     UserData data;

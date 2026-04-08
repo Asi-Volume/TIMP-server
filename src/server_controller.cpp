@@ -98,6 +98,20 @@ void ServerController::processMessage(const QString &message, QTcpSocket *socket
         }
         break;
     }
+    case RequestType::RECOVER_CODE: {
+        QStringList parts = message.split('&');
+        response = (parts.size() >= 2) ? m_model->processRecoverRequest(parts[1]) : "recover_code-";
+        break;
+    }
+    case RequestType::RECOVER_CONF: {
+        QStringList parts = message.split('&');
+        if (parts.size() >= 4) {
+            response = m_model->processRecoverConfirm(parts[1], parts[2], parts[3]);
+        } else {
+            response = "recover_conf-";
+        }
+        break;
+    }
     case RequestType::STAT: {
         QStringList parts = message.split('&');
         if (parts.size() >= 2) {

@@ -29,6 +29,8 @@ public:
     UserData getStats(const QString &login);
     bool checkSolution(const QString &login, int taskNumber, int variant, const QString &answer);
     void updateStats(const QString &login, bool isCorrect);
+    bool emailExists(const QString &email);
+    bool updatePasswordByEmail(const QString &email, const QString &newPass);
 
 private:
     Database();
