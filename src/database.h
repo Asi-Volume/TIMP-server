@@ -27,6 +27,7 @@ public:
     bool regUser(const QString &login, const QString &password, const QString &email);
     bool authUser(const QString &login, const QString &password);
     UserData getStats(const QString &login);
+    QString getLoginByEmail(const QString &email);
     bool checkSolution(const QString &login, int taskNumber, int variant, const QString &answer);
     void updateStats(const QString &login, bool isCorrect);
     bool emailExists(const QString &email);

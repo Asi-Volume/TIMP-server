@@ -1,14 +1,15 @@
 #include "mailer.h"
-#include <QFile>
-#include <QTextStream>
 #include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
+#include <QFile>
+#include <QTextStream>
 
 QString Mailing::authUser = "";
 QString Mailing::authPass = "";
 
-void Mailing::loadCredentials() {
+void Mailing::loadCredentials()
+{
     QString appDir = QCoreApplication::applicationDirPath();
     QString fullPath = appDir + "/.env";
     qDebug() << "--- Поиск конфига ---";
@@ -32,7 +33,8 @@ void Mailing::loadCredentials() {
     file.close();
 }
 
-bool Mailing::sendCode(const QString &toEmail, const QString &code) {
+bool Mailing::sendCode(const QString &toEmail, const QString &code, const QString &login)
+{
     QString host = "smtp.mail.ru";
     int port = 465;
 
@@ -55,7 +57,8 @@ bool Mailing::sendCode(const QString &toEmail, const QString &code) {
 
     auto executeStep = [&](const QString &cmd, const QString &expectedCode) {
         socket.write(cmd.toUtf8() + "\r\n");
-        if (!socket.waitForReadyRead(3000)) return false;
+        if (!socket.waitForReadyRead(3000))
+            return false;
 
         QString response = socket.readAll();
         qDebug() << ">>" << cmd << " | Server:" << response.trimmed();
@@ -64,11 +67,14 @@ bool Mailing::sendCode(const QString &toEmail, const QString &code) {
     };
 
     // smtp-рукопожатие
-    if (!executeStep("EHLO localhost", "250")) return false; // приветствие
+    if (!executeStep("EHLO localhost", "250"))
+        return false; // приветствие
 
     // авторизация
-    if (!executeStep("AUTH LOGIN", "334")) return false;
-    if (!executeStep(authUser.toUtf8().toBase64(), "334")) return false;
+    if (!executeStep("AUTH LOGIN", "334"))
+        return false;
+    if (!executeStep(authUser.toUtf8().toBase64(), "334"))
+        return false;
     if (!executeStep(authPass.toUtf8().toBase64(), "235")) { //235 - успех
         qDebug() << "Пароль не принят сервером";
         return false;
@@ -78,17 +84,16 @@ bool Mailing::sendCode(const QString &toEmail, const QString &code) {
     executeStep(QString("MAIL FROM:<%1>").arg(authUser), "250");
     executeStep(QString("RCPT TO:<%1>").arg(toEmail), "250");
 
-    if (!executeStep("DATA", "354")) return false; // данные
+    if (!executeStep("DATA", "354"))
+        return false; // данные
 
     // тело письма
-    QString message = "From: " + authUser + "\r\n" +
-                      "To: " + toEmail + "\r\n" +
-                      "Subject: Код восстановления\r\n" +
-                      "Content-Type: text/plain; charset=\"utf-8\"\r\n" +
-                      "\r\n" +
-                      "Код восстановления для аккаунта: " + code + "\r\n\n" +
-                      "Отправлено автоматически. Проект ТиМП." + "\r\n" +
-                      "\r\n.\r\n";
+    QString message = "From: " + authUser + "\r\n" + "To: " + toEmail + "\r\n"
+                      + "Subject: Код восстановления\r\n"
+                      + "Content-Type: text/plain; charset=\"utf-8\"\r\n" + "\r\n"
+                      + "Здравствуйте, " + login + "\r\n\n"
+                      + "Код восстановления для аккаунта: " + code + "\r\n\n"
+                      + "Отправлено автоматически. Проект ТиМП." + "\r\n" + "\r\n.\r\n";
 
     socket.write(message.toUtf8());
     if (socket.waitForReadyRead(3000)) {

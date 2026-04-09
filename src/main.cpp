@@ -1,6 +1,6 @@
-#include "mailer.h"
 #include <QCoreApplication>
 #include <QDebug>
+#include "mailer.h"
 #include "server_controller.h"
 
 int main(int argc, char *argv[])

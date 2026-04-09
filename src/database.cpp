@@ -97,16 +97,30 @@ bool Database::authUser(const QString &login, const QString &password)
     return false;
 }
 
-bool Database::emailExists(const QString &email) {
+bool Database::emailExists(const QString &email)
+{
     QSqlQuery query;
     query.prepare("SELECT id FROM users WHERE email = :email");
     query.bindValue(":email", email);
     return query.exec() && query.next();
 }
 
-bool Database::updatePasswordByEmail(const QString &email, const QString &newPass) {
+QString Database::getLoginByEmail(const QString &email)
+{
     QSqlQuery query;
-    QByteArray hashedPassword = QCryptographicHash::hash(newPass.toUtf8(), QCryptographicHash::Sha256).toHex();
+    query.prepare("SELECT login FROM users WHERE email = :email");
+    query.bindValue(":email", email);
+    if (query.exec() && query.next()) {
+        return query.value(0).toString();
+    }
+    return "";
+}
+
+bool Database::updatePasswordByEmail(const QString &email, const QString &newPass)
+{
+    QSqlQuery query;
+    QByteArray hashedPassword
+        = QCryptographicHash::hash(newPass.toUtf8(), QCryptographicHash::Sha256).toHex();
     query.prepare("UPDATE users SET password = :pass WHERE email = :email");
     query.bindValue(":pass", QString(hashedPassword));
     query.bindValue(":email", email);

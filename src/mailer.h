@@ -1,14 +1,15 @@
 #ifndef MAILER_H
 #define MAILER_H
 
-#include <QString>
-#include <QSslSocket>
 #include <QDebug>
+#include <QSslSocket>
+#include <QString>
 
-class Mailing {
+class Mailing
+{
 public:
     Mailing() = default;
-    static bool sendCode(const QString &toEmail, const QString &code);
+    static bool sendCode(const QString &toEmail, const QString &code, const QString &login);
     static void loadCredentials(); // Функция для загрузки данных
 
 private:
