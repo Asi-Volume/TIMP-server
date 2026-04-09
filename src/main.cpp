@@ -5,13 +5,16 @@
 
 int main(int argc, char *argv[])
 {
+    // создаем объект приложения QT для запуска цикла событий
     QCoreApplication a(argc, argv);
     Mailing::loadCredentials();
 
     qDebug() << "Запуск TCP-сервера...";
 
+    // создаем объект контроллера сервера
     ServerController server;
 
+    // пытаемся запустить сервер
     if (server.startServer(33333)) {
         qDebug() << "Сервер запущен на порту 33333";
         qDebug() << "Доступные команды:";
@@ -24,5 +27,6 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    // запускаем цикл событий для ожидания подключения клиентов и обработки событий.
     return a.exec();
 }
