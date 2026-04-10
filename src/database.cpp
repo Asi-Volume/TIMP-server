@@ -105,6 +105,23 @@ bool Database::emailExists(const QString &email)
     return query.exec() && query.next();
 }
 
+QString Database::getEmailByLogin(const QString &login) {
+    QSqlQuery query;
+    query.prepare("SELECT email FROM users WHERE login = :login");
+    query.bindValue(":login", login);
+    if (query.exec() && query.next()) {
+        return query.value(0).toString();
+    }
+    return "";
+}
+
+bool Database::loginExists(const QString &login) {
+    QSqlQuery query;
+    query.prepare("SELECT id FROM users WHERE login = :login");
+    query.bindValue(":login", login);
+    return query.exec() && query.next();
+}
+
 QString Database::getLoginByEmail(const QString &email)
 {
     QSqlQuery query;

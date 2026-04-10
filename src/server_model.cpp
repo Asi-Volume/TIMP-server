@@ -36,13 +36,13 @@ QString ServerModel::processReg(const QString &login, const QString &password, c
     return db->regUser(login, password, email) ? "reg+&" + login : "reg-";
 }
 
-QString ServerModel::processRecoverRequest(const QString &email)
+QString ServerModel::processRecoverRequest(const QString &login)
 {
-    if (!db->emailExists(email))
+    if (!db->loginExists(login))
         return "recover_code-";
 
     QString code = QString::number(QRandomGenerator::global()->bounded(100000, 999999));
-    QString login = db->getLoginByEmail(email);
+    QString email = db->getEmailByLogin(login);
     tempCodes[email] = code;
 
     if (Mailing::sendCode(email, code, login)) {

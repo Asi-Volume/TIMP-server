@@ -31,7 +31,9 @@ public:
     bool checkSolution(const QString &login, int taskNumber, int variant, const QString &answer);
     void updateStats(const QString &login, bool isCorrect);
     bool emailExists(const QString &email);
+    bool loginExists(const QString &login);
     bool updatePasswordByEmail(const QString &email, const QString &newPass);
+    QString getEmailByLogin(const QString &login);
 
 private:
     Database();
