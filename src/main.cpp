@@ -20,8 +20,10 @@ int main(int argc, char *argv[])
         qDebug() << "Доступные команды:";
         qDebug() << "  auth&login&password";
         qDebug() << "  reg&login&password&email";
-        qDebug() << "  stat&login";
-        qDebug() << "  check&login&task_number&variant&answer";
+        qDebug() << "  recover_code&email";
+        qDebug() << "  recover_confirm&email&code&new_password";
+        # qDebug() << "  stat&login";
+        # qDebug() << "  check&login&task_number&variant&answer";
     } else {
         qDebug() << "Не удалось запустить сервер";
         return 1;
