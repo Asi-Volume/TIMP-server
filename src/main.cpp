@@ -1,20 +1,35 @@
+/**
+ * @file main.cpp
+ * @brief Точка входа в серверное приложение.
+ * @details Инициализирует окружение Qt, загружает учетные данные почты
+ * и запускает TCP-сервер на прослушивание порта.
+ */
+
 #include <QCoreApplication>
 #include <QDebug>
 #include "mailer.h"
 #include "server_controller.h"
 
+/**
+ * @brief Главная функция сервера.
+ * @param argc Количество аргументов командной строки.
+ * @param argv Массив аргументов командной строки.
+ * @return Код завершения приложения.
+ */
 int main(int argc, char *argv[])
 {
-    // создаем объект приложения QT для запуска цикла событий
+    // Создание объекта приложения Qt для управления циклом событий
     QCoreApplication a(argc, argv);
+
+    // Загружаем настройки SMTP (логин/пароль) из файла .env
     Mailing::loadCredentials();
 
     qDebug() << "Запуск TCP-сервера...";
 
-    // создаем объект контроллера сервера
+    // Инициализация контроллера, который создаст серверный сокет
     ServerController server;
 
-    // пытаемся запустить сервер
+    // Открытие порта 33333 для входящих соединений
     if (server.startServer(33333)) {
         qDebug() << "Сервер запущен на порту 33333";
         qDebug() << "Доступные команды:";
@@ -22,13 +37,13 @@ int main(int argc, char *argv[])
         qDebug() << "  reg&login&password&email";
         qDebug() << "  recover_code&email";
         qDebug() << "  recover_confirm&email&code&new_password";
-        # qDebug() << "  stat&login";
-        # qDebug() << "  check&login&task_number&variant&answer";
+        qDebug() << "  stat&login";
+        qDebug() << "  check&login&task_number&variant&answer";
     } else {
         qDebug() << "Не удалось запустить сервер";
         return 1;
     }
 
-    // запускаем цикл событий для ожидания подключения клиентов и обработки событий.
+    // Запуск бесконечной обработки событий
     return a.exec();
 }

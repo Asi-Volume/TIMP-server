@@ -1,3 +1,8 @@
+/**
+ * @file server_model.cpp
+ * @brief Реализация бизнес-логики и обработки команд.
+ */
+
 #include "server_model.h"
 #include <QMap>
 #include <QRandomGenerator>

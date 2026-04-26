@@ -1,0 +1,44 @@
+# Имя проекта
+PROJECT_NAME           = "GraphApplication"
+PROJECT_NUMBER         = 1.0
+
+# Кодировка
+DOXYFILE_ENCODING      = UTF-8
+OUTPUT_LANGUAGE        = Russian
+
+# Местоположение файлов
+INPUT                  = .
+FILE_PATTERNS          = *.cpp *.h *.qml
+RECURSIVE              = YES
+EXCLUDE                = build/ \
+                         debug/ \
+                         release/ \
+                         .git/
+			
+
+# Место сохранения результата
+OUTPUT_DIRECTORY       = docs/
+
+# Настройки отображения
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = YES
+EXTRACT_STATIC         = YES
+
+# Генерация форматов
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+GENERATE_LATEX         = NO
+
+# Интеграция с графикой
+HAVE_DOT               = YES
+CLASS_GRAPH            = YES
+COLLABORATION_GRAPH    = YES
+INCLUDE_GRAPH          = YES
+INCLUDED_BY_GRAPH      = YES
+CALL_GRAPH             = YES
+CALLER_GRAPH           = YES
+
+# Оптимизация для C++ и Qt
+OPTIMIZE_OUTPUT_FOR_C  = NO
+BUILTIN_STL_SUPPORT    = YES
+QT_AUTOBRIEF           = YES
