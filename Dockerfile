@@ -1,21 +1,23 @@
-FROM ubuntu:22.04
+FROM ubuntu
 
-ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Europe/Moscow
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    qt6-base-dev \
-    qt6-tools-dev \
-    qt6-sqlite \
-    libqt6sql6-sqlite \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update
+RUN apt-get install qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools -y
+RUN apt-get install build-essential -y
 
-WORKDIR /app
+WORKDIR /root/
+RUN mkdir server
+WORKDIR /root/server/
+COPY *.cpp /root/server/
+COPY *.h /root/server/
+COPY *.pro /root/server/
+COPY *.db /root/server/
 
-COPY . .
+COPY . /root/server/
 
-RUN qmake6 server.pro && make clean && make
+RUN qmake echoServer.pro
+RUN make
 
-EXPOSE 33333
-
-CMD ["./tcp_server"]
+ENTRYPOINT ["./echoServer"]
