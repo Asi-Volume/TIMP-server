@@ -66,34 +66,66 @@ bool Mailing::sendCode(const QString &toEmail, const QString &code, const QStrin
         return response.contains(expectedCode);
     };
 
-    // smtp-рукопожатие
     if (!executeStep("EHLO localhost", "250"))
-        return false; // приветствие
+        return false;
 
-    // авторизация
     if (!executeStep("AUTH LOGIN", "334"))
         return false;
     if (!executeStep(authUser.toUtf8().toBase64(), "334"))
         return false;
-    if (!executeStep(authPass.toUtf8().toBase64(), "235")) { //235 - успех
+    if (!executeStep(authPass.toUtf8().toBase64(), "235")) {
         qDebug() << "Пароль не принят сервером";
         return false;
     }
 
-    // конверт
     executeStep(QString("MAIL FROM:<%1>").arg(authUser), "250");
     executeStep(QString("RCPT TO:<%1>").arg(toEmail), "250");
 
     if (!executeStep("DATA", "354"))
-        return false; // данные
+        return false;
 
-    // тело письма
-    QString message = "From: " + authUser + "\r\n" + "To: " + toEmail + "\r\n"
-                      + "Subject: Код восстановления\r\n"
-                      + "Content-Type: text/plain; charset=\"utf-8\"\r\n" + "\r\n"
-                      + "Здравствуйте, " + login + "\r\n\n"
-                      + "Код восстановления для аккаунта: " + code + "\r\n\n"
-                      + "Отправлено автоматически. Проект ТиМП." + "\r\n" + "\r\n.\r\n";
+    QString htmlBody = QString(R"(
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 40px 20px; }
+        .email-container { max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .header { text-align: center; color: #333333; font-size: 24px; font-weight: bold; margin-bottom: 20px; }
+        .greeting { font-size: 18px; color: #555555; margin-bottom: 15px; }
+        .message-text { font-size: 16px; color: #666666; line-height: 1.6; margin-bottom: 25px; }
+        .code-box { background-color: #f8f9fa; border: 2px dashed #007bff; color: #007bff; font-size: 32px; font-weight: bold; text-align: center; padding: 20px; border-radius: 8px; letter-spacing: 4px; margin-bottom: 30px; }
+        .footer { border-top: 1px solid #eeeeee; padding-top: 20px; font-size: 13px; color: #999999; text-align: center; line-height: 1.5; }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">Восстановление доступа</div>
+        <div class="greeting">Здравствуйте, <b>%1</b>!</div>
+        <div class="message-text">
+            Мы получили запрос на восстановление доступа к вашему аккаунту.
+            Пожалуйста, используйте следующий код для продолжения:
+        </div>
+        <div class="code-box">%2</div>
+        <div class="message-text" style="font-size: 14px;">
+            Если вы не запрашивали этот код, просто проигнорируйте данное письмо. Ваши данные в безопасности.
+        </div>
+        <div class="footer">
+            Это письмо отправлено автоматически, отвечать на него не нужно.<br>
+            <b>Проект ТиМП</b>
+        </div>
+    </div>
+</body>
+</html>
+)").arg(login, code);
+
+    QString message = "From: " + authUser + "\r\n"
+                      + "To: " + toEmail + "\r\n"
+                      + "Subject: Код восстановления аккаунта\r\n"
+                      + "MIME-Version: 1.0\r\n"
+                      + "Content-Type: text/html; charset=\"utf-8\"\r\n\r\n"
+                      + htmlBody + "\r\n.\r\n";
 
     socket.write(message.toUtf8());
     if (socket.waitForReadyRead(3000)) {

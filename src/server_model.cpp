@@ -53,10 +53,11 @@ QString ServerModel::processRecoverRequest(const QString &login)
     }
 }
 
-QString ServerModel::processRecoverConfirm(const QString &email,
+QString ServerModel::processRecoverConfirm(const QString &login,
                                            const QString &code,
                                            const QString &newPass)
 {
+    QString email = db->getEmailByLogin(login);
     if (tempCodes.value(email) == code && !code.isEmpty()) {
         if (db->updatePasswordByEmail(email, newPass)) {
             tempCodes.remove(email);
