@@ -47,34 +47,10 @@ void Database::createTables()
                "id INTEGER PRIMARY KEY AUTOINCREMENT,"
                "login TEXT UNIQUE NOT NULL,"
                "password TEXT NOT NULL,"
-               "email TEXT NOT NULL,"
+               "email TEXT UNIQUE NOT NULL,"
                "total_solved INTEGER DEFAULT 0,"
                "total_attempts INTEGER DEFAULT 0,"
                "rating INTEGER DEFAULT 0)");
-
-    query.exec("CREATE TABLE IF NOT EXISTS tasks ("
-               "id INTEGER PRIMARY KEY AUTOINCREMENT,"
-               "task_number INTEGER NOT NULL,"
-               "variant INTEGER NOT NULL,"
-               "correct_answer TEXT NOT NULL)");
-
-    QSqlQuery checkQuery;
-    checkQuery.exec("SELECT COUNT(*) FROM tasks");
-    checkQuery.next();
-    if (checkQuery.value(0).toInt() == 0) {
-        query.prepare(
-            "INSERT INTO tasks (task_number, variant, correct_answer) VALUES (1, 1, '5')");
-        query.exec();
-        query.prepare(
-            "INSERT INTO tasks (task_number, variant, correct_answer) VALUES (1, 2, '7')");
-        query.exec();
-        query.prepare(
-            "INSERT INTO tasks (task_number, variant, correct_answer) VALUES (2, 1, '12')");
-        query.exec();
-        query.prepare(
-            "INSERT INTO tasks (task_number, variant, correct_answer) VALUES (2, 2, '20')");
-        query.exec();
-    }
 }
 
 bool Database::regUser(const QString &login, const QString &password, const QString &email)
