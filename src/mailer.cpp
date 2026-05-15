@@ -1,3 +1,8 @@
+/**
+ * @file mailer.cpp
+ * @brief Реализация отправки почты через SMTP.
+ */
+
 #include "mailer.h"
 #include <QCoreApplication>
 #include <QDebug>

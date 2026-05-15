@@ -1,3 +1,8 @@
+/**
+ * @file database.cpp
+ * @brief Реализация работы с БД.
+ */
+
 #include "database.h"
 
 Database *Database::instance = nullptr;
