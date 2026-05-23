@@ -11,7 +11,8 @@ SOURCES += \
     src/main.cpp \
     src/server_controller.cpp \
     src/server_model.cpp \
-    src/database.cpp
+    src/database.cpp \
+    tst_funcforserver_test.cpp
 
 HEADERS += \
     src/mailer.h \
@@ -19,7 +20,6 @@ HEADERS += \
     src/server_model.h \
     src/database.h
 
-# Это важно для классов с Q_OBJECT
 QT += core
 
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -29,3 +29,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 DISTFILES += \
     .env.example \
     .gitignore
+
+SUBDIRS += \
+    UnitTests.pro \
+    UnitTests.pro
