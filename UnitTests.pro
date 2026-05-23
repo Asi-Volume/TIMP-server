@@ -6,17 +6,20 @@ CONFIG -= app_bundle
 
 TEMPLATE = app
 
-INCLUDEPATH += ../src
+SERVER_SRC_DIR = $$PWD/src
 
-SOURCES += tst_funcforserver_test.cpp 
+INCLUDEPATH += $$SERVER_SRC_DIR
 
 
 SOURCES += \
-    ../src/server_model.cpp \
-    ../src/database.cpp \
-    ../src/mailer.cpp
+        tst_funcforserver_test.cpp \
+    $$SERVER_SRC_DIR/server_model.cpp \
+    $$SERVER_SRC_DIR/server_controller.cpp \
+    $$SERVER_SRC_DIR/database.cpp \
+    $$SERVER_SRC_DIR/mailer.cpp
 
 HEADERS += \
-    ../src/server_model.h \
-    ../src/database.h \
-    ../src/mailer.h
+    $$SERVER_SRC_DIR/server_model.h \
+    $$SERVER_SRC_DIR/server_controller.h \
+    $$SERVER_SRC_DIR/database.h \
+    $$SERVER_SRC_DIR/mailer.h

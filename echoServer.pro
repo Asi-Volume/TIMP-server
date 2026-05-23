@@ -11,8 +11,7 @@ SOURCES += \
     src/main.cpp \
     src/server_controller.cpp \
     src/server_model.cpp \
-    src/database.cpp \
-    tst_funcforserver_test.cpp
+    src/database.cpp
 
 HEADERS += \
     src/mailer.h \

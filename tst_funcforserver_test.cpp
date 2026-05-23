@@ -1,64 +1,73 @@
 #include <QtTest>
 #include "server_model.h"
+#include "mailer.h"
 
 class FuncForServer_Test : public QObject
 {
     Q_OBJECT
+private:
+    ServerModel *server;
 
 public:
-    FuncForServer_Test() {}
+    FuncForServer_Test() : server(nullptr) {}
     ~FuncForServer_Test() {}
 
 private slots:
+    void initTestCase() {
+        Mailing::loadCredentials();
+        server = new ServerModel();
+    }
+    void cleanupTestCase() {
+        delete server;
+        QSqlQuery query;
+        query.prepare("DELETE FROM users WHERE login LIKE 'test_%'");
+        query.exec();
+    }
+
     // Тест неизвестной команды
-    void test_parseRequest_unknown()
+    void test_unknown()
     {
-        ServerModel server;
-        RequestType type = server.parseRequest("asdf");
+        RequestType type = server->parseRequest("asdf");
         QVERIFY(type == RequestType::UNKNOWN);
     }
     // Тест регистрации
-    void test_parseRequest_reg()
+    void test_reg()
     {
-        ServerModel server;
-        RequestType type = server.parseRequest("reg&user1&pass&user1@mail.ru");
+        RequestType type = server->parseRequest("reg&test_user1&pass&test_user1@mail.ru");
         QVERIFY(type == RequestType::REG);
     }
     // Тест авторизации
-    void test_parseRequest_auth()
+    void test_auth()
     {
-        ServerModel server;
-        RequestType type = server.parseRequest("auth&user1&pass");
+        RequestType type = server->parseRequest("auth&test_user1&pass");
         QVERIFY(type == RequestType::AUTH);
     }
 
     // Тест пользовательского поведения
-    void test_user_lifecycle_scenario()
+    void test_complex()
     {
-        ServerModel model;
-
-        QString testLogin = "user2";
+        QString testLogin = "test_user2";
         QString testPass = "password";
-        QString testEmail = "user2@bk.ru";
+        QString testEmail = "test_user2@bk.ru";
 
         // Проверка регистрации (reg+&логин)
-        QString regResult = model.processReg(testLogin, testPass, testEmail);
+        QString regResult = server->processReg(testLogin, testPass, testEmail);
         QCOMPARE(regResult, QString("reg+&") + testLogin);
 
         // Проверка регистрации на те же данные (reg-)
-        QString regRepeatResult = model.processReg(testLogin, "passkey", "tester@mail.ru");
+        QString regRepeatResult = server->processReg(testLogin, "passkey", "test_mail@mail.ru");
         QCOMPARE(regRepeatResult, QString("reg-"));
 
         // Проверка успешной авторизации (auth+&логин)
-        QString authResult = model.processAuth(testLogin, testPass);
+        QString authResult = server->processAuth(testLogin, testPass);
         QCOMPARE(authResult, QString("auth+&") + testLogin);
 
         // Проверка входа с существующим логином и неверным паролем (auth-)
-        QString authWrongResult = model.processAuth(testLogin, "wrong");
+        QString authWrongResult = server->processAuth(testLogin, "wrong");
         QCOMPARE(authWrongResult, QString("auth-"));
     }
 };
 
-QTEST_APPLESS_MAIN(FuncForServer_Test)
+QTEST_MAIN(FuncForServer_Test)
 
 #include "tst_funcforserver_test.moc"
